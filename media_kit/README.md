@@ -41,12 +41,12 @@ dependencies:
   media_kit:
     git:
       url: https://github.com/isaacy13/media-kit-themedeck
-      ref: main
+      ref: tmp
       path: media_kit                             # Primary package.
   media_kit_video:
     git:
       url: https://github.com/isaacy13/media-kit-themedeck
-      ref: main
+      ref: tmp
       path: media_kit_video                        # For video rendering.
   media_kit_libs_video: ^1.0.4                   # Native video dependencies.
 ```
@@ -58,7 +58,7 @@ dependencies:
   media_kit:
     git:
       url: https://github.com/isaacy13/media-kit-themedeck
-      ref: main
+      ref: tmp
       path: media_kit                             # Primary package.  
   media_kit_libs_audio: ^1.0.4                   # Native audio dependencies.
 ```

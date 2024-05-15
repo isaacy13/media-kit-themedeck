@@ -21,7 +21,7 @@ dependencies:
   media_kit:
     git:
       url: https://github.com/isaacy13/media-kit-themedeck
-      ref: main
+      ref: tmp
       path: media_kit
 
   synchronized: ^3.1.0

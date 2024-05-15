@@ -12,7 +12,7 @@ dependencies:
   media_kit_native_event_loop:
     git:
       url: https://github.com/isaacy13/media-kit-themedeck
-      ref: main
+      ref: tmp
       path: media_kit_native_event_loop
   media_kit_libs_android_video: ^1.3.6
   media_kit_libs_ios_video: ^1.1.4

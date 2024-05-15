@@ -7,7 +7,7 @@ dependencies:
   media_kit_native_event_loop:
     git:
       url: https://github.com/isaacy13/media-kit-themedeck
-      ref: main
+      ref: tmp
       path: media_kit_native_event_loop
 ```
 
