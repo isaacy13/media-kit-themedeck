@@ -201,7 +201,6 @@ class NativePlayer extends PlatformPlayer {
 
       // NOTE: Handled as part of [stop] logic.
       // isShuffleEnabled = false;
-      // isPlayingStateChangeAllowed = false;
 
       for (int i = 0; i < playlist.length; i++) {
         await _command(
@@ -215,7 +214,6 @@ class NativePlayer extends PlatformPlayer {
 
       // If [play] is `true`, then exit paused state.
       if (play) {
-        isPlayingStateChangeAllowed = true;
         final name = 'pause'.toNativeUtf8();
         final value = calloc<Uint8>();
         mpv.mpv_get_property(
@@ -277,7 +275,6 @@ class NativePlayer extends PlatformPlayer {
       await waitForVideoControllerInitializationIfAttached;
 
       isShuffleEnabled = false;
-      isPlayingStateChangeAllowed = false;
       isBufferingStateChangeAllowed = false;
 
       final commands = [
@@ -481,7 +478,6 @@ class NativePlayer extends PlatformPlayer {
         }
       }
 
-      isPlayingStateChangeAllowed = true;
       isBufferingStateChangeAllowed = false;
 
       // This condition is specifically for the case when the internal playlist is ended (with [PlaylistLoopMode.none]), and we want to play the playlist again if play/pause is pressed.
@@ -1584,52 +1580,28 @@ class NativePlayer extends PlatformPlayer {
     _error(event.ref.error);
 
     if (event.ref.event_id == generated.mpv_event_id.MPV_EVENT_START_FILE) {
-      if (isPlayingStateChangeAllowed) {
-        state = state.copyWith(
-          playing: true,
-          completed: false,
-        );
-        if (!playingController.isClosed) {
-          playingController.add(true);
-        }
-        if (!completedController.isClosed) {
-          completedController.add(false);
-        }
+      state = state.copyWith(completed: false);
+      if (!playingController.isClosed) {
+        playingController.add(true);
+      }
+      if (!completedController.isClosed) {
+        completedController.add(false);
       }
       state = state.copyWith(buffering: true);
       if (!bufferingController.isClosed) {
         bufferingController.add(true);
       }
     }
-    // NOTE: Now, --keep-open=yes is used. Thus, eof-reached property is used instead of this.
-    // if (event.ref.event_id == generated.mpv_event_id.MPV_EVENT_END_FILE) {
-    //   // Check for mpv_end_file_reason.MPV_END_FILE_REASON_EOF before modifying state.completed.
-    //   if (event.ref.data.cast<generated.mpv_event_end_file>().ref.reason == generated.mpv_end_file_reason.MPV_END_FILE_REASON_EOF) {
-    //     if (isPlayingStateChangeAllowed) {
-    //       state = state.copyWith(
-    //         playing: false,
-    //         completed: true,
-    //       );
-    //       if (!playingController.isClosed) {
-    //         playingController.add(false);
-    //       }
-    //       if (!completedController.isClosed) {
-    //         completedController.add(true);
-    //       }
-    //     }
-    //   }
-    // }
+
     if (event.ref.event_id ==
         generated.mpv_event_id.MPV_EVENT_PROPERTY_CHANGE) {
       final prop = event.ref.data.cast<generated.mpv_event_property>();
       if (prop.ref.name.cast<Utf8>().toDartString() == 'pause' &&
           prop.ref.format == generated.mpv_format.MPV_FORMAT_FLAG) {
         final playing = prop.ref.data.cast<Int8>().value == 0;
-        if (isPlayingStateChangeAllowed) {
-          state = state.copyWith(playing: playing);
-          if (!playingController.isClosed) {
-            playingController.add(playing);
-          }
+        state = state.copyWith(playing: playing);
+        if (!playingController.isClosed) {
+          playingController.add(playing);
         }
       }
       if (prop.ref.name.cast<Utf8>().toDartString() == 'core-idle' &&
@@ -2094,17 +2066,15 @@ class NativePlayer extends PlatformPlayer {
           prop.ref.format == generated.mpv_format.MPV_FORMAT_FLAG) {
         final value = prop.ref.data.cast<Bool>().value;
         if (value) {
-          if (isPlayingStateChangeAllowed) {
-            state = state.copyWith(
-              playing: false,
-              completed: true,
-            );
-            if (!playingController.isClosed) {
-              playingController.add(false);
-            }
-            if (!completedController.isClosed) {
-              completedController.add(true);
-            }
+          state = state.copyWith(
+            playing: false,
+            completed: true,
+          );
+          if (!playingController.isClosed) {
+            playingController.add(false);
+          }
+          if (!completedController.isClosed) {
+            completedController.add(true);
           }
 
           state = state.copyWith(
@@ -2711,18 +2681,6 @@ class NativePlayer extends PlatformPlayer {
 
   /// A flag to keep track of [setShuffle] calls.
   bool isShuffleEnabled = false;
-
-  /// A flag to prevent changes to [state.playing] due to `loadfile` commands in [open].
-  ///
-  /// By default, `MPV_EVENT_START_FILE` is fired when a new media source is loaded.
-  /// This event modifies the [state.playing] & [stream.playing] to `true`.
-  ///
-  /// However, the [Player] is in paused state before the media source is loaded.
-  /// Thus, [state.playing] should not be changed, unless the user explicitly calls [play] or [playOrPause].
-  ///
-  /// We set [isPlayingStateChangeAllowed] to `false` at the start of [open] to prevent this unwanted change & set it to `true` at the end of [open].
-  /// While [isPlayingStateChangeAllowed] is `false`, any change to [state.playing] & [stream.playing] is ignored.
-  bool isPlayingStateChangeAllowed = false;
 
   /// A flag to prevent changes to [state.buffering] due to `pause` causing `core-idle` to be `true`.
   ///
