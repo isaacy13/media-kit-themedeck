@@ -1585,10 +1585,7 @@ class NativePlayer extends PlatformPlayer {
 
     if (event.ref.event_id == generated.mpv_event_id.MPV_EVENT_START_FILE) {
       if (isPlayingStateChangeAllowed) {
-        state = state.copyWith(
-          playing: true,
-          completed: false,
-        );
+        state = state.copyWith(completed: false);
         if (!playingController.isClosed) {
           playingController.add(true);
         }
