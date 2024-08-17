@@ -583,6 +583,14 @@ class NativePlayer extends PlatformPlayer {
         }
       }
 
+      // If playlist is empty then change player state to paused
+      if (state.playlist.medias.isEmpty) {
+        state = state.copyWith(playing: false);
+        if (!playingController.isClosed) {
+          playingController.add(false);
+        }
+      }
+
       final command = 'playlist-remove $index'.toNativeUtf8();
       mpv.mpv_command_string(
         ctx,
