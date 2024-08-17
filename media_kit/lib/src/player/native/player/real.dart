@@ -583,11 +583,18 @@ class NativePlayer extends PlatformPlayer {
         }
       }
 
-      // If playlist is empty then change player state to paused
+      // If playlist is empty then change player state to paused and set position to zero.
       if (state.playlist.medias.isEmpty) {
-        state = state.copyWith(playing: false);
+        state = state.copyWith(
+          playing: false,
+          position: Duration.zero,
+        );
         if (!playingController.isClosed) {
           playingController.add(false);
+        }
+
+        if (!positionController.isClosed) {
+          positionController.add(Duration.zero);
         }
       }
 
