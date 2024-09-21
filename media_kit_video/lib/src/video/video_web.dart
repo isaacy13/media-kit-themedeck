@@ -234,6 +234,10 @@ class VideoState extends State<Video> with WidgetsBindingObserver {
               oldWidget.subtitleViewConfiguration
           ? widget.subtitleViewConfiguration
           : currentParams.subtitleViewConfiguration,
+      pauseUponEnteringBackgroundMode: null,
+      resumeUponEnteringForegroundMode: null,
+      onEnterFullscreen: null,
+      onExitFullscreen: null,
     );
 
     if (newParams != currentParams) {
