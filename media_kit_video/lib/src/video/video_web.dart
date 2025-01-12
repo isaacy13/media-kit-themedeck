@@ -15,6 +15,9 @@ import 'package:media_kit_video/src/utils/dispose_safe_notifer.dart';
 
 import 'package:media_kit_video/src/utils/wakelock.dart';
 
+/// Type definition for video controls builder function.
+typedef VideoControlsBuilder = Widget Function(VideoState state);
+
 /// {@template video}
 ///
 /// Video
