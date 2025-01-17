@@ -55,6 +55,7 @@ class WebPlayer extends PlatformPlayer {
         ..style.border = 'none'
         /* ..setAttribute('autoplay', 'false') */
         ..setAttribute('playsinline', 'true')
+        ..setAttribute('oncontextmenu', 'return false')
         ..pause();
       // Initialize or increment the instance count.
       js.context[kInstanceCount] ??= 0;
